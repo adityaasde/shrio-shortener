@@ -12,7 +12,7 @@ const LinkSchema = new Schema(
     expiryDate: Date,
     clicks: { type: Number, default: 0 },
     dailyClicks: {
-      date: { type: String },
+      date: { type: Date },
       count: { type: Number, default: 0 },
     },
 
