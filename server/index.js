@@ -9,6 +9,8 @@ import LinkRoutes from "./routes/LinkRoutes.js";
 import QrRoutes from "./routes/QrRoutes.js";
 import UserRoutes from "./routes/UserRoutes.js";
 import cookieParser from "cookie-parser";
+import { redirectTo } from "./controllers/LinkController.js";
+import useragent from "express-useragent";
 
 const app = express();
 dotenv.config({
@@ -25,12 +27,14 @@ app.use(compression());
 app.use(express.json({ limit: "10mb" }));
 app.use(helemt());
 app.use(cookieParser());
+app.use(useragent.express());
 
 connectToDB();
 
 app.use("/link", LinkRoutes);
 app.use("/qr", QrRoutes);
 app.use("/user", UserRoutes);
+app.get("/:slug", redirectTo);
 
 const PORT = 9500;
 
