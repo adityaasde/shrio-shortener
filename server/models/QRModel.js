@@ -9,7 +9,6 @@ const QRSchema = new Schema(
     imgUrl: { type: String, required: true },
     redirectTo: { type: String, required: true },
     createdAt: { type: Date, default: Date.now },
-    expiryDate: Date,
     updatedAt: Date,
   },
   { versionKey: false }
