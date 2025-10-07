@@ -1,4 +1,5 @@
 import { Link } from "../models/LinkModel.js";
+import useragent from "express-useragent";
 
 export const createShortUrl = async (req, res) => {
   try {
@@ -260,13 +261,51 @@ export const getShortUrlForUser = async (req, res) => {
 
 export const redirectTo = async (req, res) => {
   try {
-    const shortId = req.params.shortId;
-    if (!shortId) {
+    const slug = req.params.slug;
+    const userDevice = req.useragent;
+    if (!slug) {
       return res.status(400).json({
         message: "Expired Short Link!",
       });
     }
 
-    
-  } catch (err) {}
+    const findLink = await Link.findOne({ slug: slug });
+    const redirectUrl = findLink.redirectTo;
+
+    const isExpired = findLink.expiryDate.getTime() > Date.now();
+
+    if (!isExpired) {
+      return res.status(400).json({
+        message: "Short Link is expired!"
+      });
+    }
+
+    const todayDate = new Date().toDateString();
+    const lastDate = findLink.dailyClicks.date.toDateString();
+
+    findLink.clicks += 1;
+
+    if (todayDate !== lastDate) {
+      findLink.dailyClicks.count = 1;
+      findLink.dailyClicks.date = Date.now();
+    } else {
+      findLink.dailyClicks.count += 1;
+    }
+
+    if (userDevice.isMobile) {
+      findLink.deviceStats.mobile += 1;
+    } else {
+      findLink.deviceStats.desktop += 1;
+    }
+
+    findLink.lastUpdateAt = Date.now();
+
+    await findLink.save();
+    return res.redirect(redirectUrl);
+  } catch (err) {
+    return res.status(500).json({
+      message: "Internal server error!",
+      errMsg: err.message,
+    });
+  }
 };
