@@ -1,10 +1,9 @@
 import { Link } from "../models/LinkModel.js";
-import useragent from "express-useragent";
 
 export const createShortUrl = async (req, res) => {
   try {
     const {
-      userIP,
+      userIp,
       redirectTo,
       slug,
       expiryDate,
@@ -20,7 +19,7 @@ export const createShortUrl = async (req, res) => {
     }
 
     const newLink = new Link({
-      userIP,
+      userIp,
       userId,
       redirectTo,
       slug,
