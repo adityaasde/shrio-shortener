@@ -2,7 +2,7 @@ import mongoose, { Schema } from "mongoose";
 
 const QRSchema = new Schema(
   {
-    userIP: String,
+    userIp: String,
     userId: String,
     description: String,
     isVerifiedUser: Boolean,

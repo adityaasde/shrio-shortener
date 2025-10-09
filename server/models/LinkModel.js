@@ -2,14 +2,14 @@ import mongoose, { Schema } from "mongoose";
 
 const LinkSchema = new Schema(
   {
-    userIP: String,
+    userIp: String,
     userId: { type: String, required: true },
     description: String,
     isVerifiedUser: Boolean,
     redirectTo: { type: String, required: true },
     slug: { type: String, unique: true, required: true },
     createdAt: { type: Date, default: Date.now },
-    expiryDate: Date,
+    expireDate: Date,
     clicks: { type: Number, default: 0 },
     dailyClicks: {
       date: { type: Date },
