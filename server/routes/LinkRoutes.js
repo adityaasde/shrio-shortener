@@ -6,6 +6,7 @@ import {
   deleteShortUrlForUser,
   getShortUrl,
   getShortUrlForUser,
+  getUrl,
   updateShortUrl,
   updateShortUrlForUser,
 } from "../controllers/LinkController.js";
@@ -17,6 +18,7 @@ router.post("/v1/generate", createShortUrl);
 router.put("/v1/update/:linkId", updateShortUrl);
 router.delete("/v1/delete/:linkId", deleteShortUrl);
 router.get("/v1/get/:userId", getShortUrl);
+router.get("/v1/geturl/:linkId", getUrl);
 
 router.post("/v2/generate", UserMiddleware, createShortUrlForUser);
 router.put("/v2/update/:linkId", UserMiddleware, updateShortUrlForUser);

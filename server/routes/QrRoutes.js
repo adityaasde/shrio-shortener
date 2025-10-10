@@ -6,6 +6,7 @@ import {
   deleteQRForUser,
   getQR,
   getQRForUser,
+  getQRs,
   updateQR,
   updateQRForUser,
 } from "../controllers/QrController.js";
@@ -16,7 +17,8 @@ const router = express.Router();
 router.post("/v1/generate", createQR);
 router.put("/v1/update/:qrId", updateQR);
 router.delete("/v1/delete/:qrId", deleteQR);
-router.get("/v1/get/:userId", getQR);
+router.get("/v1/get/:userId", getQRs);
+router.get("/v1/getqr/:qrId", getQR);
 
 router.post("/v2/generate", UserMiddleware, createQRForUser);
 router.put("/v2/update/:qrId", UserMiddleware, updateQRForUser);
