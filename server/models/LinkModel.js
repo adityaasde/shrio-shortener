@@ -9,7 +9,7 @@ const LinkSchema = new Schema(
     redirectTo: { type: String, required: true },
     slug: { type: String, unique: true, required: true },
     createdAt: { type: Date, default: Date.now },
-    expireDate: Date,
+    expireDate: { type: Date },
     clicks: { type: Number, default: 0 },
     dailyClicks: {
       date: { type: Date },
