@@ -106,7 +106,7 @@ export const sendMailUser = async (to, token, type) => {
       subject = "Reset Your Password";
     }
 
-    const lastLink = `${process.env.BASE_URL}/${token}`;
+    const lastLink = `${process.env.BASE_URL}/auth/confirm-mail/${token}`;
 
     const html = template
       .replace("{{messageBody}}", messageBody)
