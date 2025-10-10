@@ -3,10 +3,11 @@ import { User } from "../models/UserModel.js";
 import { sendMailUser } from "../utils/sendMail.js";
 import { getValue, setValue } from "../store/store.js";
 import { generateToken } from "../utils/token.js";
+import jwt from "jsonwebtoken";
 
 export const signUpUser = async (req, res) => {
   try {
-    const { email, password } = req.body;
+    const { email, password, userId, userIp } = req.body;
 
     if (!email || !password) {
       return res.status(400).json({
@@ -16,7 +17,6 @@ export const signUpUser = async (req, res) => {
 
     const cleanEmail = email.trim();
     const cleanPassword = password.trim();
-    const userId = crypto.randomUUID();
 
     const isExistUser = await User.find({ email: email });
 
@@ -35,6 +35,7 @@ export const signUpUser = async (req, res) => {
 
     const createUser = new User({
       userId,
+      userIp,
       email: cleanEmail,
       password: hashPassword,
       isVerified: false,
@@ -119,7 +120,7 @@ export const loginUser = async (req, res) => {
 
     res.cookie("token", userToken, {
       httpOnly: true,
-      secure: process.env.NODE_ENV === "production",
+      secure: false,
       sameSite: "strict",
       maxAge: 60 * 60 * 1000,
     });
@@ -228,12 +229,10 @@ export const confirmUser = async (req, res) => {
         message: "Invalid token!",
       });
     }
-    console.log("user",token);
-    
+    console.log("user", token);
 
     const searchToken = getValue(token);
     console.log("confirm", searchToken);
-    
 
     if (!searchToken) {
       return res.status(400).json({
@@ -269,6 +268,34 @@ export const confirmUser = async (req, res) => {
     return res.status(500).json({
       message: "Internal server error!",
       errMsg: err,
+    });
+  }
+};
+
+export const getUser = async (req, res) => {
+  try {
+    const token = req.cookies.token;
+    console.log(token);
+
+    if (!token) {
+      return res.status(401).json({
+        message: "Unauthorized access",
+      });
+    }
+
+    const decodeToken = jwt.verify(token, process.env.JWT_SECRET);
+    const user = await User.findById(decodeToken.id).select("-password");
+
+    if (!user) {
+      return res.status(404).json({
+        message: "User not found!",
+      });
+    }
+
+    return res.status(200).json({ user });
+  } catch (err) {
+    return res.status(500).json({
+      message: err.message,
     });
   }
 };

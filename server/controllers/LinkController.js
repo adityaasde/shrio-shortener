@@ -6,7 +6,7 @@ export const createShortUrl = async (req, res) => {
       userIp,
       redirectTo,
       slug,
-      expiryDate,
+      expireDate,
       description,
       userId,
       isVerifiedUser,
@@ -18,12 +18,20 @@ export const createShortUrl = async (req, res) => {
       });
     }
 
+    const isExistslug = await Link.find({ slug: slug });
+
+    if (isExistslug.length > 0) {
+      return res.status(400).json({
+        message: "Slug has been used, try another one!",
+      });
+    }
+
     const newLink = new Link({
       userIp,
       userId,
       redirectTo,
       slug,
-      expiryDate,
+      expireDate,
       description,
       isVerifiedUser,
     });
@@ -44,10 +52,10 @@ export const createShortUrl = async (req, res) => {
 
 export const updateShortUrl = async (req, res) => {
   try {
-    const { slug, description, expiryDate, userId } = req.body;
+    const { slug, description, expireDate, userId } = req.body;
     const linkId = req.params.linkId;
 
-    if (!slug || !description || !expiryDate || !userId || !linkId) {
+    if (!slug || !description || !expireDate || !userId || !linkId) {
       return res.status(400).json({
         message: "Invalid Credientials!",
       });
@@ -56,7 +64,7 @@ export const updateShortUrl = async (req, res) => {
     const isShortUrlExist = await Link.findByIdAndUpdate(linkId, {
       slug,
       description,
-      expiryDate,
+      expireDate,
       updatedAt: Date.now(),
     });
 
@@ -79,7 +87,7 @@ export const updateShortUrl = async (req, res) => {
 
 export const deleteShortUrl = async (req, res) => {
   try {
-    const urlId = req.params.urlId;
+    const urlId = req.params.linkId;
     if (!urlId) {
       return res.status(400).json({
         message: "Invalid Credientials!",
@@ -114,11 +122,36 @@ export const getShortUrl = async (req, res) => {
       });
     }
 
-    const searchLinks = await Link.find({ userId: userId });
+    const searchLinks = await Link.find({ userId: userId }).lean();
 
     return res.status(200).json({
       message: "Successful",
       links: searchLinks,
+    });
+  } catch (err) {
+    return res.status(500).json({
+      message: "Internal Server Error!",
+      errMsg: err,
+    });
+  }
+};
+
+export const getUrl = async (req, res) => {
+  try {
+    const linkId = req.params.linkId;
+    console.log(linkId);
+
+    if (!linkId) {
+      return res.status(400).json({
+        message: "Invalid Credientials!",
+      });
+    }
+
+    const searchLinks = await Link.findById({ _id: linkId });
+
+    return res.status(200).json({
+      message: "Successful",
+      url: searchLinks,
     });
   } catch (err) {
     return res.status(500).json({
@@ -136,7 +169,7 @@ export const createShortUrlForUser = async (req, res) => {
       userIP,
       redirectTo,
       slug,
-      expiryDate,
+      expireDate,
       description,
       userId,
       isVerifiedUser,
@@ -153,7 +186,7 @@ export const createShortUrlForUser = async (req, res) => {
       userId,
       redirectTo,
       slug,
-      expiryDate,
+      expireDate,
       description,
       isVerifiedUser,
     });
@@ -174,10 +207,10 @@ export const createShortUrlForUser = async (req, res) => {
 
 export const updateShortUrlForUser = async (req, res) => {
   try {
-    const { slug, description, expiryDate, userId } = req.body;
+    const { slug, description, expireDate, userId } = req.body;
     const linkId = req.params.linkId;
 
-    if (!slug || !description || !expiryDate || !userId || !linkId) {
+    if (!slug || !description || !expireDate || !userId || !linkId) {
       return res.status(400).json({
         message: "Invalid Credientials!",
       });
@@ -186,7 +219,7 @@ export const updateShortUrlForUser = async (req, res) => {
     const isShortUrlExist = await Link.findByIdAndUpdate(linkId, {
       slug,
       description,
-      expiryDate,
+      expireDate,
       updatedAt: Date.now(),
     });
 
@@ -209,14 +242,14 @@ export const updateShortUrlForUser = async (req, res) => {
 
 export const deleteShortUrlForUser = async (req, res) => {
   try {
-    const urlId = req.params.urlId;
-    if (!urlId) {
+    const linkId = req.params.linkId;
+    if (!linkId) {
       return res.status(400).json({
         message: "Invalid Credientials!",
       });
     }
 
-    const isDelete = await Link.findByIdAndDelete(urlId);
+    const isDelete = await Link.findByIdAndDelete(linkId);
 
     if (!isDelete) {
       return res.status(400).json({
@@ -230,7 +263,7 @@ export const deleteShortUrlForUser = async (req, res) => {
   } catch (err) {
     return res.status(500).json({
       message: "Internal Server Error!",
-      errMsg: err,
+      errMsg: err.message,
     });
   }
 };
@@ -271,16 +304,16 @@ export const redirectTo = async (req, res) => {
     const findLink = await Link.findOne({ slug: slug });
     const redirectUrl = findLink.redirectTo;
 
-    const isExpired = findLink.expiryDate.getTime() > Date.now();
+    const isExpired = findLink.expireDate.getTime() > Date.now();
 
     if (!isExpired) {
       return res.status(400).json({
-        message: "Short Link is expired!"
+        message: "Short Link is expired!",
       });
     }
 
-    const todayDate = new Date().toDateString();
-    const lastDate = findLink.dailyClicks.date.toDateString();
+    const todayDate = new Date();
+    const lastDate = new Date(findLink.dailyClicks.date);
 
     findLink.clicks += 1;
 

@@ -2,8 +2,7 @@ import { QR } from "../models/QRModel.js";
 
 export const createQR = async (req, res) => {
   try {
-    const { userIP, userId, imgUrl, redirectTo, expiryDate, isVerifiedUser } =
-      req.body;
+    const { userIP, userId, imgUrl, redirectTo, isVerifiedUser, slug } = req.body;
 
     if (!imgUrl || !redirectTo) {
       return res.status(400).json({
@@ -17,7 +16,7 @@ export const createQR = async (req, res) => {
       imgUrl,
       redirectTo,
       isVerifiedUser,
-      expiryDate,
+      slug
     });
 
     await userQR.save();
@@ -29,26 +28,25 @@ export const createQR = async (req, res) => {
   } catch (err) {
     return res.status(500).json({
       message: "Internal server error!",
-      errMsg: err,
+      errMsg: err.message,
     });
   }
 };
 
 export const updateQR = async (req, res) => {
   try {
-    const { expiryDate, redirectTo, description, userId } = req.body;
+    const { redirectTo, description, userId } = req.body;
     const qrId = req.params.qrId;
 
-    if (!redirectTo || !expiryDate || !userId) {
+    if (!redirectTo || !userId) {
       return res.status(400).json({
         message: "Invalid credientials!",
       });
     }
 
     const QrUpdate = await QR.findByIdAndUpdate(qrId, {
-      redirectTo,
-      expiryDate,
-      description,
+      redirectTo: redirectTo,
+      description: description,
       updatedAt: Date.now(),
     });
 
@@ -59,12 +57,12 @@ export const updateQR = async (req, res) => {
     }
 
     return res.status(200).json({
-      message: "QR has been updated!",
+      message: "QR code has been updated!",
     });
   } catch (err) {
     return res.status(500).json({
       message: "Internal server error!",
-      errMsg: err,
+      errMsg: err.message,
     });
   }
 };
@@ -93,12 +91,12 @@ export const deleteQR = async (req, res) => {
   } catch (err) {
     return res.status(500).json({
       message: "Internal server error!",
-      errMsg: err,
+      errMsg: err.message,
     });
   }
 };
 
-export const getQR = async (req, res) => {
+export const getQRs = async (req, res) => {
   try {
     const userId = req.params.userId;
 
@@ -123,7 +121,37 @@ export const getQR = async (req, res) => {
   } catch (err) {
     return res.status(500).json({
       message: "Internal server error!",
-      errMsg: err,
+      errMsg: err.message,
+    });
+  }
+};
+
+export const getQR = async (req, res) => {
+  try {
+    const qrId = req.params.qrId;
+
+    if (!qrId) {
+      return res.status(400).json({
+        message: "Invalid credientials!",
+      });
+    }
+
+    const findQRs = await QR.findOne({ _id: qrId });
+
+    if (findQRs.length == 0) {
+      return res.status(400).json({
+        message: "Failed to get QRs",
+      });
+    }
+
+    return res.status(200).json({
+      message: "Successful!",
+      qr: findQRs,
+    });
+  } catch (err) {
+    return res.status(500).json({
+      message: "Internal server error!",
+      errMsg: err.message,
     });
   }
 };
@@ -132,8 +160,7 @@ export const getQR = async (req, res) => {
 
 export const createQRForUser = async (req, res) => {
   try {
-    const { userIP, userId, imgUrl, redirectTo, expiryDate, isVerifiedUser } =
-      req.body;
+    const { userIP, userId, imgUrl, redirectTo, isVerifiedUser, slug, description } = req.body;
 
     if (!imgUrl || !redirectTo) {
       return res.status(400).json({
@@ -147,7 +174,8 @@ export const createQRForUser = async (req, res) => {
       imgUrl,
       redirectTo,
       isVerifiedUser,
-      expiryDate,
+      slug,
+      description
     });
 
     await userQR.save();
@@ -159,17 +187,17 @@ export const createQRForUser = async (req, res) => {
   } catch (err) {
     return res.status(500).json({
       message: "Internal server error!",
-      errMsg: err,
+      errMsg: err.message,
     });
   }
 };
 
 export const updateQRForUser = async (req, res) => {
   try {
-    const { expiryDate, redirectTo, description, userId } = req.body;
+    const { redirectTo, description, userId } = req.body;
     const qrId = req.params.qrId;
 
-    if (!redirectTo || !expiryDate || !userId) {
+    if (!redirectTo || !userId) {
       return res.status(400).json({
         message: "Invalid credientials!",
       });
@@ -177,7 +205,6 @@ export const updateQRForUser = async (req, res) => {
 
     const QrUpdate = await QR.findByIdAndUpdate(qrId, {
       redirectTo,
-      expiryDate,
       description,
       updatedAt: Date.now(),
     });
@@ -189,12 +216,12 @@ export const updateQRForUser = async (req, res) => {
     }
 
     return res.status(200).json({
-      message: "QR has been updated!",
+      message: "QR code has been updated!",
     });
   } catch (err) {
     return res.status(500).json({
       message: "Internal server error!",
-      errMsg: err,
+      errMsg: err.message,
     });
   }
 };
@@ -223,7 +250,7 @@ export const deleteQRForUser = async (req, res) => {
   } catch (err) {
     return res.status(500).json({
       message: "Internal server error!",
-      errMsg: err,
+      errMsg: err.message,
     });
   }
 };
@@ -253,7 +280,51 @@ export const getQRForUser = async (req, res) => {
   } catch (err) {
     return res.status(500).json({
       message: "Internal server error!",
-      errMsg: err,
+      errMsg: err.message,
+    });
+  }
+};
+
+
+export const redirectForQr = async (req, res) => {
+  try {
+    const slug = req.params.slug;
+    const userDevice = req.useragent;
+    if (!slug) {
+      return res.status(400).json({
+        message: "Invalid QR Code",
+      });
+    }
+
+    const findQR = await QR.findOne({ slug: slug });
+    const redirectUrl = findQR.redirectTo;
+
+    const todayDate = new Date()
+    const lastDate = new Date(findQR.dailyScans.date);
+
+    findQR.scans += 1;
+
+    if (todayDate !== lastDate) {
+      findQR.dailyScans.count = 1;
+      findQR.dailyScans.date = Date.now();
+    } else {
+      findQR.dailyScans.count += 1;
+    }
+
+    if (userDevice.isMobile) {
+      findQR.deviceStats.mobile += 1;
+    } else {
+      findQR.deviceStats.desktop += 1;
+    }
+
+    findQR.lastUpdateAt = Date.now();
+
+    await findQR.save();
+    return res.redirect(redirectUrl);
+  } catch (err) {
+    return res.status(500).json({
+      message: "Internal server error!",
+      errMsg: err.message,
     });
   }
 };
