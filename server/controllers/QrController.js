@@ -2,7 +2,7 @@ import { QR } from "../models/QRModel.js";
 
 export const createQR = async (req, res) => {
   try {
-    const { userIP, userId, imgUrl, redirectTo, isVerifiedUser, slug } = req.body;
+    const { userIP, userId, imgUrl, redirectTo, isVerifiedUser, description, slug } = req.body;
 
     if (!imgUrl || !redirectTo) {
       return res.status(400).json({
@@ -16,6 +16,7 @@ export const createQR = async (req, res) => {
       imgUrl,
       redirectTo,
       isVerifiedUser,
+      description,
       slug
     });
 

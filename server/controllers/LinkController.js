@@ -18,9 +18,9 @@ export const createShortUrl = async (req, res) => {
       });
     }
 
-    const isExistslug = await Link.find({ slug: slug });
+    const isExistslug = await Link.findOne({ slug });
 
-    if (isExistslug.length > 0) {
+    if (isExistslug) {
       return res.status(400).json({
         message: "Slug has been used, try another one!",
       });
@@ -42,11 +42,16 @@ export const createShortUrl = async (req, res) => {
       url: newLink,
     });
   } catch (err) {
-    console.error(err);
-    return res.status(500).json({
-      message: "Internal Server Error!",
-      errMsg: err,
-    });
+    if (err.code === 11000) {
+      return res.status(400).json({
+        message: "Slug has been used, try another one!",
+      });
+    } else {
+      return res.status(500).json({
+        message: "Internal Server Error!",
+        errMsg: err.message,
+      });
+    }
   }
 };
 
@@ -113,7 +118,7 @@ export const deleteShortUrl = async (req, res) => {
   }
 };
 
-export const getShortUrl = async (req, res) => {
+export const getAllUrls = async (req, res) => {
   try {
     const userId = req.params.userId;
     if (!userId) {
@@ -139,7 +144,6 @@ export const getShortUrl = async (req, res) => {
 export const getUrl = async (req, res) => {
   try {
     const linkId = req.params.linkId;
-    console.log(linkId);
 
     if (!linkId) {
       return res.status(400).json({
@@ -268,7 +272,7 @@ export const deleteShortUrlForUser = async (req, res) => {
   }
 };
 
-export const getShortUrlForUser = async (req, res) => {
+export const getAllUrlsForUser = async (req, res) => {
   try {
     const userId = req.params.userId;
     if (!userId) {
@@ -277,7 +281,7 @@ export const getShortUrlForUser = async (req, res) => {
       });
     }
 
-    const searchLinks = await Link.find({ userId: userId });
+    const searchLinks = await Link.find({ userId: userId }).lean();
 
     return res.status(200).json({
       message: "Successful",
