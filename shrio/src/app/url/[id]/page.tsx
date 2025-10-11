@@ -51,8 +51,12 @@ export default function Url() {
         setUrlData(fetch.toPass);
         return;
       }
-    } catch (err: any) {
-      setMsg(err.message);
+    } catch (err: unknown) {
+      if (err instanceof Error) {
+        setMsg(err.message);
+      } else {
+        setMsg("An unknown error occurred");
+      }
       setPageLoading(false);
       return;
     }
@@ -107,8 +111,12 @@ export default function Url() {
         setLoading(false);
         return;
       }
-    } catch (err: any) {
-      setMsg(err.message);
+    } catch (err: unknown) {
+      if (err instanceof Error) {
+        setMsg(err.message);
+      } else {
+        setMsg("An unknown error occurred");
+      }
       setLoading(false);
       return;
     }
@@ -141,8 +149,12 @@ export default function Url() {
         window.location.href = "/";
         return;
       }
-    } catch (err: any) {
-      setMsg(err.message);
+    } catch (err: unknown) {
+      if (err instanceof Error) {
+        setMsg(err.message);
+      } else {
+        setMsg("An unknown error occurred");
+      }
       setLoading(false);
       return;
     }

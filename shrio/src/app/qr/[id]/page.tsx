@@ -46,8 +46,12 @@ export default function QR() {
         setQrData(fetch.toPass);
         return;
       }
-    } catch (err: any) {
-      setMsg(err.message);
+    } catch (err: unknown) {
+      if (err instanceof Error) {
+        setMsg(err.message);
+      } else {
+        setMsg("An unknown error occurred");
+      }
       setPageLoading(false);
       return;
     }
@@ -95,8 +99,12 @@ export default function QR() {
         setLoading(false);
         return;
       }
-    } catch (err: any) {
-      setMsg(err.message);
+    } catch (err: unknown) {
+      if (err instanceof Error) {
+        setMsg(err.message);
+      } else {
+        setMsg("An unknown error occurred");
+      }
       setLoading(false);
       return;
     }
@@ -175,21 +183,27 @@ export default function QR() {
               className="flex flex-col gap-2 w-full border border-stone-900 p-2 rounded-lg text-center"
             >
               <p className="line-clamp-1">Today's Scans</p>
-              <p className="text-lg font-semibold">{qrData?.dailyScans.count}</p>
+              <p className="text-lg font-semibold">
+                {qrData?.dailyScans.count}
+              </p>
             </div>
             <div
               id="block"
               className="flex flex-col gap-2 w-full border border-stone-900 p-2 rounded-lg text-center"
             >
               <p>Mobile</p>
-              <p className="text-lg font-semibold">{qrData?.deviceStats.mobile}</p>
+              <p className="text-lg font-semibold">
+                {qrData?.deviceStats.mobile}
+              </p>
             </div>
             <div
               id="block"
               className="flex flex-col gap-2 w-full border border-stone-900 p-2 rounded-lg text-center"
             >
               <p>Desktop</p>
-              <p className="text-lg font-semibold">{qrData?.deviceStats.desktop}</p>
+              <p className="text-lg font-semibold">
+                {qrData?.deviceStats.desktop}
+              </p>
             </div>
           </div>
         </div>

@@ -81,8 +81,13 @@ export default function Home() {
     try {
       const imgUrl = await QRCode.toDataURL(url);
       return imgUrl;
-    } catch (err: any) {
-      setQrMsg(err.message);
+    } catch (err: unknown) {
+      if (err instanceof Error) {
+        setQrMsg(err.message);
+      } else {
+        setQrMsg("An unknown error occurred");
+      }
+      return;
     }
   };
 
@@ -128,8 +133,12 @@ export default function Home() {
         expireDate: defaultExpire,
       }));
       return;
-    } catch (err: any) {
-      setMsg(err.message);
+    } catch (err: unknown) {
+      if (err instanceof Error) {
+        setMsg(err.message);
+      } else {
+        setMsg("An unknown error occurred");
+      }
       setLoading(false);
       return;
     }
@@ -168,8 +177,12 @@ export default function Home() {
         setQrLoading(false);
         setSavedQrs((prev) => [...prev, req.toPass]);
       }
-    } catch (err: any) {
-      setQrMsg(err.message);
+    } catch (err: unknown) {
+      if (err instanceof Error) {
+        setQrMsg(err.message);
+      } else {
+        setQrMsg("An unknown error occurred");
+      }
       setQrLoading(false);
       return;
     }
@@ -197,8 +210,12 @@ export default function Home() {
         setQrMsg(reqDelete.message);
         return;
       }
-    } catch (err: any) {
-      setQrMsg(err.message);
+    } catch (err: unknown) {
+      if (err instanceof Error) {
+        setQrMsg(err.message);
+      } else {
+        setQrMsg("An unknown error occurred");
+      }
       return;
     }
   };
@@ -292,7 +309,7 @@ export default function Home() {
                   value={urlData.slug}
                   onChange={inputHandler}
                   id="slug"
-                  placeholder="Your URL’s nickname (e.g. my-cool-page)"
+                  placeholder="Your URL's nickname (e.g. my-cool-page)"
                   className="p-2 border border-stone-800 outline-none focus:ring-stone-900 focus:ring-1 rounded-lg w-full"
                 />
               </div>
@@ -304,7 +321,7 @@ export default function Home() {
                   value={urlData.description}
                   onChange={inputHandler}
                   id="description"
-                  placeholder="What’s this link about? Keep it short & sweet"
+                  placeholder="What's this link about? Keep it short & sweet"
                   className="p-2 border border-stone-800 outline-none focus:ring-stone-900 focus:ring-1 rounded-lg w-full"
                 />
               </div>
@@ -422,7 +439,7 @@ export default function Home() {
                   id="description"
                   value={qrData.description}
                   onChange={inputHandlerQR}
-                  placeholder="What’s this link about? Keep it short & sweet"
+                  placeholder="What's this link about? Keep it short & sweet"
                   className="p-2 border border-stone-800 outline-none focus:ring-stone-900 focus:ring-1 rounded-lg w-full"
                 />
               </div>
