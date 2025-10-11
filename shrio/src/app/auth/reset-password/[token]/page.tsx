@@ -1,47 +1,66 @@
 "use client";
 
 import BtnLoader from "@/components/BtnLoader";
-import { signupUser } from "@/service/signup";
-import { authUser } from "@/types/auth";
-import Link from "next/link";
-import React, { useRef, useState } from "react";
+import { resetPassword } from "@/service/resetPassword";
+import { useParams } from "next/navigation";
+import React, { useEffect, useRef, useState } from "react";
 
-export default function SignUp() {
+export default function ResetPassword() {
   const passwordRef = useRef<HTMLInputElement | null>(null);
+  const conPasswordRef = useRef<HTMLInputElement | null>(null);
   const [showPassword, setPassword] = useState<boolean>(false);
   const [showMsg, setMsg] = useState<string>("");
   const [loading, setLoading] = useState<boolean>(false);
-  const [signUpData, setSignUpData] = useState<authUser>({
-    email: "",
+  const params = useParams<{ token: string }>();
+  const token = params.token || "";
+  const [resetData, setResetData] = useState({
     password: "",
   });
+  const [confirmPassword, setConfirmPassword] = useState<string>("");
+
+  const handleInput = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const { value, name } = e.target;
+    setResetData((prev) => ({
+      ...prev,
+      [name]: value,
+    }));
+  };
+
+  useEffect(() => {
+    if (!token) {
+      window.location.href = "/auth/login";
+      return;
+    }
+  }, []);
 
   const togglePassword = () => {
     setPassword((prev) => !prev);
   };
 
-  const handleInput = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const { name, value } = e.target;
-    setSignUpData((prev) => ({
-      ...prev,
-      [name]: value,
-    }));
-  };
-  
-
-  const userSignup = async (e: React.ChangeEvent<HTMLFormElement>) => {
+  const resetPasswordUser = async (e: React.ChangeEvent<HTMLFormElement>) => {
     try {
       e.preventDefault();
       setLoading(true);
-      const req = await signupUser(signUpData.email, signUpData.password);
-      if (!req.success) {
+
+      if (confirmPassword != resetData.password) {
+        setMsg("Both password not matching!");
         setLoading(false);
-        setMsg(req.message);
         return;
       }
 
-      setMsg(req.message);
+      if (!token) {
+        return;
+      }
+
+      const req = await resetPassword(resetData.password, token);
+      if (!req.success) {
+        setMsg(req.message);
+        setLoading(false);
+        return;
+      }
+
       setLoading(false);
+      setMsg(req.message);
       return;
     } catch (err: any) {
       setMsg(err.message);
@@ -49,6 +68,7 @@ export default function SignUp() {
       return;
     }
   };
+
   return (
     <div className="mt-24">
       <div
@@ -56,30 +76,36 @@ export default function SignUp() {
         className="max-w-[450px] min-w-[250px] mx-auto flex flex-col items-center justify-center p-2 gap-4"
       >
         <div id="head" className="text-2xl font-semibold">
-          SignUp to Shrio
+          Reset Password
         </div>
         <div id="form" className="w-full">
-          <form className="w-full flex flex-col gap-2" onSubmit={userSignup}>
+          <form
+            className="w-full flex flex-col gap-2"
+            onSubmit={resetPasswordUser}
+          >
             <input
-              type="email"
-              className="w-full border border-stone-900 p-2 outline-none focus:ring-stone-800 focus:ring-1 rounded-md"
-              id="email"
-              name="email"
-              value={signUpData.email}
+              ref={passwordRef}
+              type={showPassword ? "text" : "password"}
+              value={resetData.password}
               onChange={handleInput}
-              placeholder="Email address"
+              className="w-full border border-stone-900 p-2 outline-none focus:ring-stone-800 focus:ring-1 rounded-md"
+              id="password"
+              name="password"
+              placeholder="Password (Must be 8 characters)"
               required
             />
             <div className="flex flex-row items-center gap-2">
               <input
-                ref={passwordRef}
-                name="password"
-                value={signUpData.password}
-                onChange={handleInput}
+                ref={conPasswordRef}
                 type={showPassword ? "text" : "password"}
-                id="password"
+                name="password"
+                value={confirmPassword}
+                onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
+                  setConfirmPassword(e.target.value)
+                }
+                id="con-password"
                 className="w-full border border-stone-900 p-2 outline-none focus:ring-stone-800 focus:ring-1 rounded-md"
-                placeholder="Password (Must be 8 characters)"
+                placeholder="Confirm password"
                 required
               />
               <button
@@ -100,7 +126,7 @@ export default function SignUp() {
                 type="submit"
                 className="w-full p-2 bg-white text-black font-semibold outline-none cursor-pointer hover:opacity-80 rounded-md transition-all duration-200"
               >
-                Continue
+                Change Password
               </button>
             ) : (
               <button
@@ -111,15 +137,6 @@ export default function SignUp() {
               </button>
             )}
           </form>
-          <div
-            id="signin"
-            className="flex flex-row items-center justify-center p-2 gap-1"
-          >
-            Have an account ?
-            <Link href="/auth/login" className="text-sky-500 hover:underline">
-              Login
-            </Link>
-          </div>
         </div>
       </div>
     </div>
