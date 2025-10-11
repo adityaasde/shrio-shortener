@@ -120,7 +120,7 @@ export const loginUser = async (req, res) => {
 
     res.cookie("token", userToken, {
       httpOnly: true,
-      secure: false,
+      secure: process.env.NODE_ENV != "dev",
       sameSite: "strict",
       maxAge: 60 * 60 * 1000,
     });
@@ -229,10 +229,8 @@ export const confirmUser = async (req, res) => {
         message: "Invalid token!",
       });
     }
-    console.log("user", token);
 
     const searchToken = getValue(token);
-    console.log("confirm", searchToken);
 
     if (!searchToken) {
       return res.status(400).json({
@@ -255,7 +253,7 @@ export const confirmUser = async (req, res) => {
 
     res.cookie("token", userToken, {
       httpOnly: true,
-      secure: false,
+      secure: process.env.NODE_ENV != "dev",
       sameSite: "strict",
       maxAge: 60 * 60 * 1000,
     });
@@ -275,24 +273,40 @@ export const confirmUser = async (req, res) => {
 export const getUser = async (req, res) => {
   try {
     const token = req.cookies.token;
-    console.log(token);
 
     if (!token) {
-      return res.status(401).json({
-        message: "Unauthorized access",
-      });
+      return res.status(401).json({ message: "Unauthorized access" });
     }
 
-    const decodeToken = jwt.verify(token, process.env.JWT_SECRET);
-    const user = await User.findById(decodeToken.id).select("-password");
+    const decodedToken = jwt.verify(token, process.env.JWT_SECRET);
+    const user = await User.findById(decodedToken.id).select("userId email");
 
     if (!user) {
-      return res.status(404).json({
-        message: "User not found!",
-      });
+      return res.status(404).json({ message: "User not found!" });
     }
 
-    return res.status(200).json({ user });
+    return res.status(200).json({
+      user: {
+        id: user.userId,
+        email: user.email,
+      }
+    });
+  } catch (err) {
+    return res.status(500).json({ message: err.message });
+  }
+};
+
+export const logout = async (req, res) => {
+  try {
+    res.clearCookie("token", {
+      httpOnly: true,
+      secure: process.env.NODE_ENV != "dev",
+      sameSite: "strict",
+    });
+
+    return res.status(200).json({
+      message: "Logout successful!",
+    });
   } catch (err) {
     return res.status(500).json({
       message: err.message,

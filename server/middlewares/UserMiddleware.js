@@ -1,10 +1,9 @@
 import jwt from "jsonwebtoken";
-import nodemailer from "nodemailer";
 
 export const UserMiddleware = async (req, res, next) => {
   try {
     const token = req.cookies.token;
-
+    
     if (!token) {
       return res.status(401).json({
         message: "No token provided!"
@@ -17,7 +16,7 @@ export const UserMiddleware = async (req, res, next) => {
   } catch (err) {
     return res.status(500).json({
       message: "Internal server error!",
-      errMsg: err,
+      errMsg: err.message,
     });
   }
 };
