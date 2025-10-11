@@ -44,10 +44,10 @@ export const fetchQrs = async (
         toPass: res.qr,
       };
     }
-  } catch (err: any) {
+  } catch (err: unknown) {
     return {
       success: false,
-      message: err.message,
+      message: err instanceof Error ? err.message : "Unknown error occurred",
     };
   }
 };

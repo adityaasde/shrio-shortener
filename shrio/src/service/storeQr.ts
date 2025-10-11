@@ -55,7 +55,10 @@ export const storeQr = async (
     }
 
     return { success: true, message: res.message, toPass: res.qr };
-  } catch (err: any) {
-    return { success: false, message: err.message };
+  } catch (err: unknown) {
+    return {
+      success: false,
+      message: err instanceof Error ? err.message : "Unknown error occurred",
+    };
   }
 };

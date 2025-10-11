@@ -35,7 +35,7 @@ export const updateQr = async (
         "Content-Type": "application/json",
       },
       method: "PUT",
-      credentials: isUser ?  "include" : "omit",
+      credentials: isUser ? "include" : "omit",
       body: JSON.stringify(qrCred),
     });
 
@@ -51,10 +51,10 @@ export const updateQr = async (
         message: res.message,
       };
     }
-  } catch (err: any) {
+  } catch (err: unknown) {
     return {
       success: false,
-      message: err.message,
+      message: err instanceof Error ? err.message : "Unknown error occurred",
     };
   }
 };

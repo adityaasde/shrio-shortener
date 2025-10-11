@@ -28,11 +28,10 @@ export const fetchUser = async () => {
         loggedIn: true,
       };
     }
-  } catch (err: any) {
-    userStore.setState({ user: null });
+  } catch (err: unknown) {
     return {
-      user: null,
-      loggedIn: false,
+      success: false,
+      message: err instanceof Error ? err.message : "Unknown error occurred",
     };
   }
 };

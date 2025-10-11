@@ -38,10 +38,10 @@ export const loginUser = async (email: string, password: string): Promise<Functi
       message: "Login successful!",
       toPass: res.user,
     };
-  } catch (err: any) {
+  } catch (err: unknown) {
     return {
       success: false,
-      message: err.message,
+      message: err instanceof Error ? err.message : "Unknown error occurred",
     };
   }
 };

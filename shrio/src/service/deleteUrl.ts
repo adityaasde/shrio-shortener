@@ -12,14 +12,6 @@ export const deleteUrl = async (
   }
 
   try {
-    let userId;
-    if (!user?.id) {
-      const getId = localStorage.getItem("sh-id");
-      userId = getId;
-    } else {
-      userId = user.id;
-    }
-
     const isUser = user ? true : false;
     const version = isUser ? "v2" : "v1";
     const serverURL = process.env.NEXT_PUBLIC_SERVER_URL;
@@ -45,10 +37,10 @@ export const deleteUrl = async (
         message: res.message,
       };
     }
-  } catch (err: any) {
+  } catch (err: unknown) {
     return {
       success: false,
-      message: err.message,
+      message: err instanceof Error ? err.message : "Unknown error occurred",
     };
   }
 };

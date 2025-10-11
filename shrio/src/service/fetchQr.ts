@@ -12,14 +12,6 @@ export const fetchQr = async (
   }
 
   try {
-    let userId;
-    if (!user?.id) {
-      const getId = localStorage.getItem("sh-id");
-      userId = getId;
-    } else {
-      userId = user.id;
-    }
-
     const isUser = user ? true : false;
     const version = isUser ? "v2" : "v1";
 
@@ -54,10 +46,10 @@ export const fetchQr = async (
         };
       }
     }
-  } catch (err: any) {
+  } catch (err: unknown) {
     return {
       success: false,
-      message: err.message,
+      message: err instanceof Error ? err.message : "Unknown error occurred",
     };
   }
 };
