@@ -62,8 +62,12 @@ export default function ResetPassword() {
       setLoading(false);
       setMsg(req.message);
       return;
-    } catch (err: any) {
-      setMsg(err.message);
+    } catch (err: unknown) {
+      if (err instanceof Error) {
+        setMsg(err.message);
+      } else {
+        setMsg("An unknown error occurred");
+      }
       setLoading(false);
       return;
     }

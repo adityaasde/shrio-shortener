@@ -48,8 +48,12 @@ export default function Login() {
       user(req.toPass);
       router.push("/");
       return;
-    } catch (err: any) {
-      setMsg(err.message);
+    } catch (err: unknown) {
+      if (err instanceof Error) {
+        setMsg(err.message);
+      } else {
+        setMsg("An unknown error occurred");
+      }
       setLoading(false);
       return;
     }

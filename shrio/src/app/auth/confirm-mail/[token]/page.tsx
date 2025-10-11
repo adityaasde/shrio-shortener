@@ -12,8 +12,8 @@ export default function ConfirmMail() {
   const router = useRouter();
   const params = useParams<{ token: string }>();
   const token = params.token;
-  let user = userStore((state) => state.setUser);
-  
+  const setUser = userStore((state) => state.setUser);
+
   const [showMsg, setMsg] = useState<string>("");
 
   const authMailUser = async () => {
@@ -35,10 +35,14 @@ export default function ConfirmMail() {
 
       setMsg(req.message);
       setLoading(false);
-      user(req.toPass);
+      setUser(req.toPass);
       router.push("/");
-    } catch (err: any) {
-      setMsg(err.message);
+    } catch (err: unknown) {
+      if (err instanceof Error) {
+        setMsg(err.message);
+      } else {
+        setMsg("An unknown error occurred");
+      }
       setLoading(false);
       return;
     }

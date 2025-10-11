@@ -195,13 +195,12 @@ export default function Home() {
 
   const deleteUserQr = async (id: string) => {
     if (!id) return;
-
-    let ask = confirm("are u sure ?");
-    if (!ask) {
-      return;
-    }
-
     try {
+      const ask = confirm("are u sure ?");
+
+      if (!ask) {
+        return;
+      }
       const reqDelete = await deleteQr(id, user);
       if (!reqDelete.success) {
         setQrMsg(reqDelete.message);
