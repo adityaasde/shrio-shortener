@@ -18,9 +18,9 @@ Built **Shrio** using Next.js (TypeScript), Express.js, and MongoDB - a secure p
 
 ## Highlights (Shrio)
 
-*Note: Rate limiting is already implemented at 20 requests per method to prevent abuse.*
-
 - Developed a full-featured link management platform with Next.js (TypeScript), Express.js, and MongoDB.
+
+- Rate limiting implemented at 50 requests per method to prevent abuse.
 
 - Implemented secure email/password authentication with JWT-based session management.
 
