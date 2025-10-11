@@ -120,10 +120,8 @@ export const sendMailUser = async (to, token, type) => {
       html,
     });
 
-    console.log("Email sent :", to);
     return true;
   } catch (err) {
-    console.log(err);
     return false;
   }
 };
