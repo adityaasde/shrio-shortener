@@ -3,38 +3,10 @@ import "./globals.css";
 import { Header } from "@/components/Header";
 
 export const metadata: Metadata = {
-  title: {
-    default: "Shrio",
-    template: "%s | Shrio", 
-  },
+  title: "Shrio - URL Shortener & QR Code Generator",
   description:
-    "Shrio is a blazing-fast URL shortener and QR code generator. Shorten long links, share them easily, and create QR codes in one click.",
-  keywords: [
-    "URL shortener",
-    "QR code generator",
-    "link shortener",
-    "free URL shortener",
-    "create QR code",
-    "fast link sharing",
-  ],
+    "Shrio is a fast URL shortener and QR code generator. Shorten links and create QR codes instantly.",
   authors: [{ name: "Shrio" }],
-  openGraph: {
-    title: "Shrio - Fast URL Shortener & QR Code Generator",
-    description:
-      "Make your links shorter and smarter. Generate QR codes instantly and share anywhere with Shrio.",
-    url: "https://yourdomain.com",
-    siteName: "Shrio",
-    images: [
-      {
-        url: "https://yourdomain.com/og-image.png",
-        width: 1200,
-        height: 630,
-        alt: "Shrio - Shorten URLs & Generate QR Codes",
-      },
-    ],
-    locale: "en_US",
-    type: "website",
-  },
 };
 
 export default function RootLayout({
